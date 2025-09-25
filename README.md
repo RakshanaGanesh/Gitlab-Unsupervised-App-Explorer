@@ -5,6 +5,7 @@ This project uses **unsupervised learning** techniques to find and visualize sim
 
 ## Features
 
+
 - Find similar apps using:
   - Category + Rating
   - Category + Size
