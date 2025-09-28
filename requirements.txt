@@ -4,3 +4,4 @@ numpy
 plotly
 gensim
 scipy
+gunicorn
