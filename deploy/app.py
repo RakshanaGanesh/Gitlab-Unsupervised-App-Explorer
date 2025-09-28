@@ -13,20 +13,21 @@ app = Flask(__name__)
 
 # Load trained models and graphs
 models = {
-    "Category + Installs": "category_installs.pkl",
-    "Category + Rating": "category_rating.pkl",
-    "Category + Size": "category_size.pkl",
-    "Category + Reviews": "category_reviews.pkl",
-    "Combined": "Combined.pkl"
+    "Category + Installs": "deploy/category_installs.pkl",
+    "Category + Rating": "deploy/category_rating.pkl",
+    "Category + Size": "deploy/category_size.pkl",
+    "Category + Reviews": "deploy/category_reviews.pkl",
+    "Combined": "deploy/Combined.pkl"
 }
 
 graphs = {
-    "Category + Installs": "category_installs.graphml",
-    "Category + Rating": "category_rating.graphml",
-    "Category + Size": "category_size.graphml",
-    "Category + Reviews": "category_reviews.graphml",
-    "Combined": "Combined.graphml"
+    "Category + Installs": "deploy/category_installs.graphml",
+    "Category + Rating": "deploy/category_rating.graphml",
+    "Category + Size": "deploy/category_size.graphml",
+    "Category + Reviews": "deploy/category_reviews.graphml",
+    "Combined": "deploy/Combined.graphml"
 }
+
 
 model_objects = {name: pickle.load(open(models[name], "rb")) for name in models}
 graph_objects = {name: nx.read_graphml(graphs[name]) for name in graphs}
@@ -169,3 +170,4 @@ def find_similar():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
