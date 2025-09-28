@@ -110,7 +110,7 @@
             const app_name = document.getElementById("app_name").value;
             const model = document.getElementById("model").value;
             
-            axios.post("http://127.0.0.1:5000/find_similar", { app_name, model })
+            axios.post("https://dl-bvg8fgg8g4fwemfu.canadacentral-01.azurewebsites.net/find_similar", { app_name, model })
                 .then(response => {
                     const data = response.data;
                     if (data.error) {
@@ -131,3 +131,4 @@
     </script>
 </body>
 </html>
+
