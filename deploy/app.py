@@ -8,29 +8,54 @@ from gensim.models import Word2Vec
 from scipy.spatial.distance import cosine
 import json
 import plotly.colors
+import os
 
 app = Flask(__name__)
 
-# Load trained models and graphs
-models = {
-    "Category + Installs": "deploy/category_installs.pkl",
-    "Category + Rating": "deploy/category_rating.pkl",
-    "Category + Size": "deploy/category_size.pkl",
-    "Category + Reviews": "deploy/category_reviews.pkl",
-    "Combined": "deploy/Combined.pkl"
+def find_file(filename, search_path):
+    """Recursively search for filename in search_path, return full path if found."""
+    for root, dirs, files in os.walk(search_path):
+        if filename in files:
+            return os.path.join(root, filename)
+    return None
+
+# File names you expect
+model_filenames = {
+    "Category + Installs": "category_installs.pkl",
+    "Category + Rating": "category_rating.pkl",
+    "Category + Size": "category_size.pkl",
+    "Category + Reviews": "category_reviews.pkl",
+    "Combined": "Combined.pkl"
 }
 
-graphs = {
-    "Category + Installs": "deploy/category_installs.graphml",
-    "Category + Rating": "deploy/category_rating.graphml",
-    "Category + Size": "deploy/category_size.graphml",
-    "Category + Reviews": "deploy/category_reviews.graphml",
-    "Combined": "deploy/Combined.graphml"
+graph_filenames = {
+    "Category + Installs": "category_installs.graphml",
+    "Category + Rating": "category_rating.graphml",
+    "Category + Size": "category_size.graphml",
+    "Category + Reviews": "category_reviews.graphml",
+    "Combined": "Combined.graphml"
 }
 
+# Base search path (adjust as needed, e.g., current working directory)
+base_path = os.getcwd()
 
-model_objects = {name: pickle.load(open(models[name], "rb")) for name in models}
-graph_objects = {name: nx.read_graphml(graphs[name]) for name in graphs}
+# Resolve full paths dynamically
+models = {name: find_file(fname, base_path) for name, fname in model_filenames.items()}
+graphs = {name: find_file(fname, base_path) for name, fname in graph_filenames.items()}
+
+# Load models and graphs from resolved paths
+model_objects = {name: pickle.load(open(path, "rb")) for name, path in models.items() if path}
+graph_objects = {name: nx.read_graphml(path) for name, path in graphs.items() if path}
+
+# Optional: Log missing files
+missing_models = [name for name, path in models.items() if not path]
+missing_graphs = [name for name, path in graphs.items() if not path]
+if missing_models or missing_graphs:
+    print("Warning - Missing files:")
+    if missing_models:
+        print("Models:", missing_models)
+    if missing_graphs:
+        print("Graphs:", missing_graphs)
 
 # Function to find similar apps
 def find_similar_apps(input_app, model, G, top_n=9):
@@ -55,7 +80,6 @@ def find_similar_apps(input_app, model, G, top_n=9):
     return similarities[:top_n], input_node
 
 # Function to generate similarity graph
-
 def plot_similarity_graph(input_app, selected_model):
     G = graph_objects[selected_model]
     model = model_objects[selected_model]
@@ -144,8 +168,6 @@ def plot_similarity_graph(input_app, selected_model):
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
 
-
-
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -170,4 +192,3 @@ def find_similar():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
